@@ -1,0 +1,120 @@
+---
+title: "COVID-19 Top Counry"
+author: "Patrick Kelly"
+date: "2/26/2020"
+output: html_document
+---
+
+### My setup
+
+macOS Catalina 10.15.3
+
+R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
+
+RStudio Version 1.1.463
+
+[Click Here](https://www.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6)"Corona Virus Data"
+
+[Click Here](https://www.worldatlas.com/aatlas/ctycodes.htm)"Country labels"
+
+[Click Here](https://www.worldometers.info/world-population/population-by-country/)"Country Populations"
+
+# Corona Virus Cases per 100,000
+
+```{r}
+list.of.packages = c("tidyverse",
+                     "ggplot2",
+                     "countrycode",
+                     "devtools",
+                     "linguisticsdown",
+                     "htmlwidgets")
+                     new.packages <-
+                     list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
+                     if (length(new.packages))
+                     install.packages(new.packages)
+                     suppressMessages(library(tidyverse))
+                                          suppressMessages(library(countrycode))
+                     suppressMessages(library(linguisticsdown))
+                     suppressMessages(library(htmlwidgets))
+```
+
+```{r}
+# devtools::install_github("rensa/ggflags")
+suppressMessages(library(ggflags))
+```
+
+```{r}
+cases <- c(78064,1261,374,57,91,178,139)
+pop <- c(1439323776,51269185,
+      60461826,331002651,
+      5850342,126476461,83992949)
+per_100000 <- rep(1e5,6)
+risk <- pop / per_100000
+cases_per_100000 <- round(cases/risk,2)
+cases_per_100000_2 <- as.character(cases_per_100000)
+```
+
+```{r}
+dat <-
+  dplyr::tibble(
+  country = c(
+  "China",
+  "South Korea",
+  "Italy",
+  "USA",
+  "Singapore",
+  "Japan",
+  "Iran"
+  ),
+  
+  count = cases_per_100000,
+  label = cases_per_100000_2,
+  code = c("cn","kr","it","us","sg","jp","ir"))
+p <-  dat %>% mutate(country = reorder(country, count)) %>%
+  ggplot(aes(country, count, label = label)) +
+  geom_bar(stat = "identity", fill = "#bd1816") +
+  geom_text(nudge_y = +0.4,
+  color = "black",
+  size = 6) +
+  geom_flag(y = -.23, aes(country = code), size = 9) +
+  # scale_y_continuous(breaks = c(0, 10, 20, 30), limits = c(0, 30)) +
+  labs(title = "Corona Virus Cases per 100,000 at risk by Country",
+  subtitle = "February 26, 2020") +
+  ggthemes::theme_economist() +
+  theme(
+  axis.title.y = element_blank(),
+  axis.ticks.x = element_blank(),
+  axis.line.x = element_blank(),
+  axis.title.x = element_blank(),
+  axis.text.x = element_blank()) +
+  coord_flip() 
+p
+```
+
+<!-- Save Plot Image -->
+
+```{r}
+# png(filename="corona_RR.png")
+# plot(p)
+# dev.off()
+
+```
+
+# Comments
+
+When does the corona virus outbreak pgrogrss to an epidemic and then to a pandemic disease?
+
+Maybe when a multi-continent number of cases reaches an average of 10 cases per 100,000 at risk?
+
+Cover your mouth when sneezing and wash your hands often.
+
+```{r, echo=FALSE}
+corona <- "corona.gif"
+include_graphics2(corona)
+```
+
+
+
+
+
+
